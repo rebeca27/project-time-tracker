@@ -13,7 +13,7 @@ Project Time Tracker is a command-line tool designed for developers and project 
 To install the Project Time Tracker, follow these steps:
 1. Clone the repository: `git clone https://your-repository-url`
 2. Navigate to the project directory: `cd project-time-tracker`
-3. Install dependencies: `pip install -r requirements.txt` (if applicable)
+3. Install dependencies: `pip install argparse`
 
 ## Usage
 To use the tool, execute the script from the command line. Here are some common commands:

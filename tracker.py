@@ -90,8 +90,26 @@ class TimeTracker:
         self.current_project = None
         self.start_time = None
         self.save_data()
-        print(f"Stopped tracking project: {self.current_project}")
+     
+    def export_report_to_csv(self, file_name='report.csv', filtered_projects=None):
+        projects_to_export = filtered_projects if filtered_projects is not None else self.projects
 
+        with open(file_name, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Project', 'Start Time', 'End Time', 'Duration'])
+
+            for project, entries in projects_to_export.items():
+                total_duration = datetime.timedelta()
+                for entry in entries:
+                    start = datetime.datetime.fromisoformat(entry['start'])
+                    end = datetime.datetime.fromisoformat(entry['end'])
+                    duration = end - start
+                    total_duration += duration
+                    writer.writerow([project, start, end, duration])
+
+                writer.writerow([f"Total for {project}", '', '', total_duration])
+
+        print(f"Report exported to {file_name}")
 
     def report(self):
         for project, entries in self.projects.items():
@@ -127,6 +145,37 @@ class TimeTracker:
             self.projects = {}
         print("Data loaded.")
 
+
+    def filter_by_project(self, project_name):
+        if project_name in self.projects:
+            return self.projects[project_name]
+        else:
+            print(f"No data found for project: {project_name}")
+            return []
+
+    def filter_by_date_range(self, start_date, end_date):
+        filtered_data = {}
+        for project, entries in self.projects.items():
+            filtered_entries = []
+            for entry in entries:
+                entry_date = datetime.datetime.fromisoformat(entry['start']).date()
+                if start_date <= entry_date <= end_date:
+                    filtered_entries.append(entry)
+            if filtered_entries:
+                filtered_data[project] = filtered_entries
+        return filtered_data
+
+    def filter_by_minimum_duration(self, min_duration):
+        filtered_data = {}
+        for project, entries in self.projects.items():
+            filtered_entries = []
+            for entry in entries:
+                duration = datetime.datetime.fromisoformat(entry['end']) - datetime.datetime.fromisoformat(entry['start'])
+                if duration >= min_duration:
+                    filtered_entries.append(entry)
+            if filtered_entries:
+                filtered_data[project] = filtered_entries
+        return filtered_data
 
     def export_to_csv(self, file_name='report.csv'):
         with open(file_name, mode='w', newline='') as file:
